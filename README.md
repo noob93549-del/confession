@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will You Be My Love?</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #111;
+            color: white;
+            text-align: center;
+            padding: 50px;
+            margin: 0;
+            position: relative;
+            overflow-x: hidden;
+        }
+        .anim-layer {
+            pointer-events: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 0;
+        }
+        .heart, .iphone-heart, .butterfly {
+            position: absolute;
+            opacity: 0.8;
+            z-index: 1;
+            will-change: transform,opacity;
+        }
+        .heart {
+            width: 36px;
+            height: 36px;
+            animation: floatHeart 4s linear infinite;
+        }
+        @keyframes floatHeart {
+            0% {
+                transform: translateY(100vh) scale(1) rotate(0deg);
+                opacity: 0.8;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-10vh) scale(1.2) rotate(25deg);
+                opacity: 0;
+            }
+        }
+        .butterfly {
+            width: 44px;
+            height: 44px;
+            animation: flyButterfly 8s linear infinite;
+        }
+        @keyframes flyButterfly {
+            from {
+                transform: translateY(100vh) translateX(0vw) scale(1) rotate(-10deg);
+                opacity: 0.7;
+            }
+            40% {
+                transform: translateY(65vh) translateX(50vw) scale(1.25) rotate(10deg);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-12vh) translateX(95vw) scale(1) rotate(-10deg);
+                opacity: 0.3;
+            }
+        }
+        .iphone-heart {
+            width: 38px;
+            height: 38px;
+            animation: floatIphoneHeart 6s ease-in infinite;
+        }
+        @keyframes floatIphoneHeart {
+            0% {
+                transform: translateY(100vh) scale(1);
+                opacity: 0.3;
+            }
+            30% {
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(45vh) scale(1.30) rotate(8deg);
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-10vh) scale(1);
+                opacity: 0;
+            }
+        }
+        h1 { font-size: 3em; margin-bottom: 20px; z-index: 2; position: relative; }
+        p { font-size: 1.5em; margin: 20px 0; z-index: 2; position: relative;}
+        button {
+            background: #ff1493;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            cursor: pointer;
+            border-radius: 10px;
+            margin: 10px;
+            transition: background 0.3s, color 0.3s, top 0.2s, left 0.2s;
+            z-index: 2; 
+        }
+        button:hover { background: #333; color: #ff1493; }
+        #response { display: none; font-size: 2em; margin-top: 20px; z-index: 2; position: relative;}
+        .btn-wrap {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            position: relative;
+        }
+        @media (max-width: 500px) {
+            .btn-wrap {
+                flex-direction: column;
+                gap: 15px;
+                margin-bottom: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="anim-layer" id="hearts"></div>
+    <div class="anim-layer" id="butterflies"></div>
+    <div class="anim-layer" id="iphoneHearts"></div>
+    <h1>Hey MUSKAN,</h1>
+    <p>
+        Do you believe in magic? Because whenever you smile at me, the world feels enchanting.<br>
+        <strong>WILL YOU BE MINE...</strong><br>
+        <span style="font-size:1.1em;color:#ffecb3;">
+        (Warning: Side effects may include extreme happiness, goofy smiles, and uncontrollable blushing 😜)
+        </span>
+    </p>
+    <div class="btn-wrap">
+        <button onclick="showResponse('yes')" id="yesBtn">चलो मान गए! 😍</button>
+        <button id="noBtn" onclick="cycleNo()">NO!</button>
+    </div>
+    <div id="response"></div>
+    <script>
+        // Twemoji PNG CDN urls (Apple-style look PNGs from Twemoji/Twitter source)
+        const TWEMOJI = {
+            heart: [
+                'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/2764.png', // ❤️
+            ],
+            butterfly: [
+                'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f98b.png', // 🦋
+            ],
+            iphoneHearts: [
+                'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f497.png', // 💗
+                'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f496.png', // 💖
+                'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f49c.png', // 💜
+                'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f495.png', // 💕
+                'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f498.png', // 💘
+            ]
+        };
+
+        // Heart float animation (Apple-style Twemoji PNG)
+        const heartsContainer = document.getElementById('hearts');
+        function createHeart() {
+            const heart = document.createElement('img');
+            heart.className = 'heart';
+            heart.src = TWEMOJI.heart[0];
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = (3 + Math.random() * 2) + 's';
+            heart.style.width = (30 + Math.random() * 15) + 'px';
+            heart.style.height = 'auto';
+            heartsContainer.appendChild(heart);
+            setTimeout(() => { heart.remove(); }, 4000);
+        }
+        setInterval(createHeart, 500);
+
+        // Butterfly flying animation (Apple-style Twemoji PNG)
+        const butterfliesContainer = document.getElementById('butterflies');
+        function createButterfly() {
+            const butterfly = document.createElement('img');
+            butterfly.className = 'butterfly';
+            butterfly.src = TWEMOJI.butterfly[0];
+            butterfly.style.left = (Math.random() * 60 + 10) + "vw";
+            butterfly.style.animationDuration = (7 + Math.random() * 2) + "s";
+            butterfly.style.width = (35 + Math.random()*16) + "px";
+            butterfly.style.height = 'auto';
+            butterfly.style.top = Math.random() * 70 + "vh";
+            butterfliesContainer.appendChild(butterfly);
+            setTimeout(() => { butterfly.remove(); }, 8000);
+        }
+        setInterval(createButterfly, 1800);
+
+        // iPhone heart emoji animation (Apple-style Twemoji PNG)
+        const iphoneHeartsContainer = document.getElementById('iphoneHearts');
+        function createIphoneHeart() {
+            const heart = document.createElement('img');
+            heart.className = 'iphone-heart';
+            heart.src = TWEMOJI.iphoneHearts[Math.floor(Math.random()*TWEMOJI.iphoneHearts.length)];
+            heart.style.left = (10 + Math.random() * 80) + "vw";
+            heart.style.animationDuration = (5 + Math.random() * 2) + "s";
+            heart.style.width = (30 + Math.random()*15) + "px";
+            heart.style.height = 'auto';
+            iphoneHeartsContainer.appendChild(heart);
+            setTimeout(() => { heart.remove(); }, 6000);
+        }
+        setInterval(createIphoneHeart, 1200);
+
+        // NO button cycling logic
+        const noBtn = document.getElementById('noBtn');
+        const noTexts = [
+            "NO!",
+            "Think Again 🤔",
+            "Please YES kar do 😇",
+            "Please mdm ji 🙏",
+            "Please chiku tap YES 😝"
+        ];
+        let noStep = 0;
+        function cycleNo() {
+            noStep++;
+            if(noStep < noTexts.length) {
+                noBtn.innerText = noTexts[noStep];
+            } else {
+                noBtn.style.display = "none";
+            }
+        }
+
+        // Button response
+        function showResponse(answer) {
+            const response = document.getElementById('response');
+            if (answer === 'yes') {
+                response.innerHTML = "अब तो पार्टी बनती है! 🥳💕";
+                response.style.color = "#00ff00";
+            }
+            response.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
